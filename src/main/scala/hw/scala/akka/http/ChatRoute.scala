@@ -1,6 +1,7 @@
-package hw.scala.akka
+package hw.scala.akka.http
 
 import akka.http.scaladsl.server.Route
+import hw.scala.akka.ChatRepository
 import hw.scala.akka.model.{Channel, Message}
 
 import scala.concurrent.ExecutionContext
@@ -13,11 +14,11 @@ class ChatRoute(repo: ChatRepository)(implicit ec: ExecutionContext) extends Con
       } ~ (post & entity(as[String])) { entity =>
         repo.createChannel(entity)
       }
-    } ~ (pathPrefixId[Channel] & pathPrefix("messages") & pathEnd) { channelId =>
+    } ~ (pathPrefixChannelId & pathPrefix("messages") & pathEnd) { channelId =>
       get {
         repo.listMessages(channelId)
       } ~ (put & entity(as[Message])) { entity =>
-        repo.createMessage(channelId, entity.username, entity.text)
+        repo.createMessage(channelId, entity)
       }
     }
   }
