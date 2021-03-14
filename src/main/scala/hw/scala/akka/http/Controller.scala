@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 import scala.util.{Failure, Success}
 
 trait Controller extends Directives {
-  def pathPrefixId: Directive1[ChannelId] = pathPrefix(IntNumber).map(new ChannelId(_))
+  def pathPrefixChannelId: Directive1[ChannelId] = pathPrefix(IntNumber).map(new ChannelId(_))
 
   val successResponse: Route = complete("""{"success":true}""")
   def errorResponse(error: ApiError): Route =
