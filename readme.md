@@ -1,5 +1,7 @@
 # Akka Actor Chat
 
+[![Build Status](https://travis-ci.com/diht2016/akka-actor-chat.svg?branch=main)](https://travis-ci.com/diht2016/akka-actor-chat)
+
 This project is a [homework task](task.md). The aim is to create a backend of web chat application using akka actors as a state storage.
 
 ## How to run the app
