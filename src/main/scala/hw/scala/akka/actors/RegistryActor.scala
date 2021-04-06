@@ -1,9 +1,9 @@
 package hw.scala.akka.actors
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import hw.scala.akka.model.{Channel, ChannelId}
 
-class RegistryActor(system: ActorSystem) extends Actor {
+class RegistryActor extends Actor {
   import RegistryActor._
 
   override def receive: Receive = withState(List.empty)
@@ -12,7 +12,7 @@ class RegistryActor(system: ActorSystem) extends Actor {
     case name: String =>
       val newId = new ChannelId(state.length)
       val newChannel = Channel(newId, name)
-      val newActor = system.actorOf(Props[ChannelActor]())
+      val newActor = createChannelActor
       val newState = state.appended(ChannelRecord(newChannel, newActor))
       context.become(withState(newState))
       sender ! newId
@@ -21,6 +21,8 @@ class RegistryActor(system: ActorSystem) extends Actor {
     case id: ChannelId =>
       sender ! state.lift(id.value).map(_.actor)
   }
+
+  def createChannelActor: ActorRef = context.actorOf(Props[ChannelActor]())
 }
 
 object RegistryActor {

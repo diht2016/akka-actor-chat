@@ -64,7 +64,10 @@ class RegistryActorSpec extends TestKit(ActorSystem("ChannelActorSpec"))
   trait FreshActor {
     protected val systemMock: ActorSystem = mock[ActorSystem]
     protected val testActor: ActorRef = TestProbe().ref
-    protected val actor: ActorRef = system.actorOf(Props(classOf[RegistryActor], systemMock))
+    protected val actor: ActorRef = system.actorOf(Props(new RegistryActor {
+      override def createChannelActor: ActorRef =
+        systemMock.actorOf(Props[ChannelActor]())
+    }))
 
     protected def expectActorCreation: CallHandler1[Props, ActorRef] =
       (systemMock.actorOf: Props => ActorRef) expects * returns testActor

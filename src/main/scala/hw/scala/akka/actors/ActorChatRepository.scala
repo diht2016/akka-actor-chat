@@ -9,9 +9,8 @@ import hw.scala.akka.model.{ApiError, Channel, ChannelId, Message}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
-class ActorChatRepository extends ChatRepository {
-  private val system: ActorSystem = ActorSystem("chat")
-  private val registry: ActorRef = system.actorOf(Props(classOf[RegistryActor], system))
+class ActorChatRepository(system: ActorSystem) extends ChatRepository {
+  private val registry: ActorRef = system.actorOf(Props[RegistryActor])
 
   private implicit val ec: ExecutionContext = system.getDispatcher
   private implicit val timeout: Timeout = 3.seconds

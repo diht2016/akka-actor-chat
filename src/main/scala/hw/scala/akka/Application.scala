@@ -12,7 +12,7 @@ object Application extends App {
   implicit val system: ActorSystem = ActorSystem("app-system")
   implicit val ec: ExecutionContext = system.dispatcher
 
-  val repo = new ActorChatRepository
+  val repo = new ActorChatRepository(system)
   val route = new ChatRoute(repo).route
 
   val binding = Http()
