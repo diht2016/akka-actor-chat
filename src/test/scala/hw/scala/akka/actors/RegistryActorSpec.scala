@@ -15,26 +15,27 @@ class RegistryActorSpec extends TestKit(ActorSystem("ChannelActorSpec"))
   with Matchers
   with MockFactory
   with BeforeAndAfterAll {
+  import RegistryActor._
 
   "RegistryActor" should "send empty list of channels on start" in new FreshActor {
     expectActorCreation.never()
-    actor ! ()
+    actor ! ListChannels
     expectMsg(List.empty)
   }
 
   it should "create ChannelActor and send id when creating a channel" in new FreshActor {
     expectActorCreation.once()
-    actor ! "channelName"
+    actor ! CreateChannel("channelName")
     expectMsg(ChannelId(0))
   }
 
   it should "retrieve created channels in correct order" in new FreshActor {
     expectActorCreation.twice()
-    actor ! "channelName"
+    actor ! CreateChannel("channelName")
     expectMsg(ChannelId(0))
-    actor ! "one more channel"
+    actor ! CreateChannel("one more channel")
     expectMsg(ChannelId(1))
-    actor ! ()
+    actor ! ListChannels
     expectMsg(List(
       Channel(ChannelId(0), "channelName"),
       Channel(ChannelId(1), "one more channel")
@@ -43,21 +44,21 @@ class RegistryActorSpec extends TestKit(ActorSystem("ChannelActorSpec"))
 
   it should "retrieve actor by its id" in new FreshActor {
     expectActorCreation.once()
-    actor ! "channelName"
+    actor ! CreateChannel("channelName")
     expectMsg(ChannelId(0))
-    actor ! ChannelId(0)
+    actor ! GetChannelActor(ChannelId(0))
     expectMsg(Some(testActor))
   }
 
   it should "respond with None if no actor found" in new FreshActor {
     expectActorCreation.once()
-    actor ! "channelName"
+    actor ! CreateChannel("channelName")
     expectMsg(ChannelId(0))
-    actor ! ChannelId(-1)
+    actor ! GetChannelActor(ChannelId(-1))
     expectMsg(None)
-    actor ! ChannelId(1)
+    actor ! GetChannelActor(ChannelId(1))
     expectMsg(None)
-    actor ! ChannelId(100500)
+    actor ! GetChannelActor(ChannelId(100500))
     expectMsg(None)
   }
 

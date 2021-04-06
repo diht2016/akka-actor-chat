@@ -9,16 +9,16 @@ class RegistryActor extends Actor {
   override def receive: Receive = withState(List.empty)
 
   def withState(state: List[ChannelRecord]): Receive = {
-    case name: String =>
+    case CreateChannel(name) =>
       val newId = new ChannelId(state.length)
       val newChannel = Channel(newId, name)
       val newActor = createChannelActor
       val newState = state.appended(ChannelRecord(newChannel, newActor))
       context.become(withState(newState))
       sender ! newId
-    case () =>
+    case ListChannels =>
       sender ! state.map(_.channel)
-    case id: ChannelId =>
+    case GetChannelActor(id) =>
       sender ! state.lift(id.value).map(_.actor)
   }
 
@@ -26,5 +26,9 @@ class RegistryActor extends Actor {
 }
 
 object RegistryActor {
-  case class ChannelRecord(channel: Channel, actor: ActorRef)
+  case class CreateChannel(name: String)
+  case object ListChannels
+  case class GetChannelActor(id: ChannelId)
+
+  private case class ChannelRecord(channel: Channel, actor: ActorRef)
 }
